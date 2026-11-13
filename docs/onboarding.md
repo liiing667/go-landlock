@@ -57,6 +57,14 @@ Take into account:
 * If your program needs to invoke IOCTLs on newly opened device files,
   you must specifically grant that access right using
   `FSRule.WithIoctlDev()`.
+* Filesystem rules on nested paths combine as a conjunction: An
+  access right is only available below a path if every rule on an
+  ancestor path grants it. Granting e.g. read-only access on a
+  directory and read-write access on one of its subdirectories can
+  therefore never grant write access on the subdirectory. Go-Landlock
+  detects such unsatisfiable rule combinations and returns an error
+  before the ruleset is submitted, instead of failing later with
+  `EPERM`/`EACCES` at runtime.
 
 ## Rules for network access rights
 

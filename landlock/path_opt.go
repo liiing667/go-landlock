@@ -12,6 +12,7 @@ type FSRule struct {
 	paths         []string
 	enforceSubset bool // enforce that accessFS is a subset of cfg.HandledAccessFS
 	ignoreMissing bool // ignore missing paths
+	internal      bool // injected by go-landlock itself, not part of the user's rules
 }
 
 // withRights adds the given access rights to the rights enforced in the FSRule

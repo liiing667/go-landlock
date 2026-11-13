@@ -72,6 +72,15 @@ func createRuleset(c Config, abi abiInfo, rules []Rule) (fd int, eff Config, err
 		return -1, c, nil // Success: Nothing to restrict.
 	}
 
+	// Validate that the filesystem rules form a satisfiable
+	// conjunction before any Landlock syscall creates the ruleset.
+	// This turns e.g. a read-only rule on an ancestor together with
+	// a read-write rule on a descendant into an early error,
+	// instead of an EPERM/EACCES only after the domain is enforced.
+	if err := checkOverlappingPathRules(rules, c); err != nil {
+		return -1, Config{}, err
+	}
+
 	rulesetAttr := c.rulesetAttr()
 	fd, err = ll.LandlockCreateRuleset(&rulesetAttr, 0)
 	if err != nil {

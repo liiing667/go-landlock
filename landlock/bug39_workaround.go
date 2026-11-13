@@ -23,5 +23,6 @@ func maybeWorkaroundBug39(c Config, rules []Rule) []Rule {
 	}
 	path := fmt.Sprintf("/proc/%v/task", os.Getpid())
 	extraRule := PathAccess(readDir, path)
+	extraRule.internal = true
 	return append(rules, extraRule)
 }
